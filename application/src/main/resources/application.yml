@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: CloudMonitorRD #应用名称
+  data:
+    jpa:
+      repositories:
+        enabled: true #启用jpa
+
+  jpa:
+    properties:
+      javax:
+        persistence.query.timeout: "${JAVAX_PERSISTENCE_QUERY_TIMEOUT:30000}" #如果环境变量JAVAX_PERSISTENCE_QUERY_TIMEOUT被设置，它的值将覆盖默认值，否则使用默认值30000
+    #默认为true，设置为false后，禁止spring在render页面时，使用jpa查询数据库
+    open-in-view: "false"
+    hibernate:
+      ddl-auto: none #none：不执行任何操作，默认值；create：创建表；create-drop：创建表并删除表；update：更新表；validate：验证表；
+  datasource:
+    # 数据库连接池
+    driver-class-name: "${SPRING_DRIVER_CLASS_NAME:org.postgresql.Driver}" #默认为org.postgresql.Driver
+    url: "${SPRING_DATASOURCE_URL:jdbc:postgres//localhost:5432/cloudmonitor}"
+    username: "${SPRING_DATASOURCE_USERNAME:admin}"
+    password: "${SPRING_DATASOURCE_PASSWORD:123456}"
+    hikari:
+      # 这个属性是用来配置HikariCP（高性能的JDBC连接池）的泄漏检测阈值。当一个数据库连接在关闭后未正确返回到连接池并在设定的时间阈值内保持非活动状态时，HikariCP会认为这个连接可能已经泄漏，并发出警告。
+      leak-detection-threshold: "${SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD:0}" #默认为0，表示不检测泄漏，设置为非零值，表示检测泄漏的阈值，单位为毫秒
+      # 这个属性是用来配置HikariCP（高性能的JDBC连接池）的连接池大小。连接池的大小决定了可以同时打开的最大连接数。
+      maximum-pool-size: "${SPRING_DATASOURCE_MAXIMUM_POOL_SIZE:16}"
+      # 这个属性是用来配置HikariCP（高性能的JDBC连接池）是否将连接池注册为JMX bean。
+      register-mbeans: "${SPRING_DATASOURCE_HIKARI_REGISTER_MBEANS:false}" #默认为false，表示不注册JMX bean
+      # 这个属性是用来配置HikariCP（高性能的JDBC连接池）的连接超时时间。连接超时时间是指在获取连接时等待连接 becoming available的超时时间。
+      connection-timeout: "${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:30000}" #默认为30000毫秒，表示30秒
+  rsocket:
+    server:
+      transport: websocket
+server:
+  port:
+    8080
+jwt:
+  #  token生成签名
+  TokenSigningKey: "${JWT_TOKEN_SIGNING_KEY:CloudMonitorRDDefaultSigningKey-alpha}"
+  # token过期时间,默认为1小时
+  ExpirationTime: "${JWT_EXPIRATION_TIME:3_600_000}"
